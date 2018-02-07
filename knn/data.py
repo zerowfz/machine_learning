@@ -1,6 +1,5 @@
 #处理手写字体数据
 import numpy as np
-import pandas as pd
 import glob
 def get_data():
     #将文本数据变成所用的训练测试数据。
@@ -12,10 +11,17 @@ def get_data():
     all_num = len(train_name)
     label = np.zeros(all_num)
     data = np.zeros([all_num,1024])
-    for n,i in enumerate(train_num):
+    for n,i in enumerate(train_name):
         label[n] = i.split('/')[-1][0]
-        out = pd.read_csv(i,header=None)
-        data[:,n] = out.values.flatten()
-    return data
-    
-        
+        with open(i,'r') as f:
+            lines = f.readlines()
+            for n1,j in enumerate(lines):
+                j = j.strip()
+                for n2,m in enumerate(j):
+                    data[n,32*n1+n2] = int(m)
+    X1 = data[:train_num,:]
+    Y1 = label[:train_num]
+    X2 = data[train_num:,:]
+    Y2 = label[train_num:]
+    return X1,Y1,X2,Y2
+
