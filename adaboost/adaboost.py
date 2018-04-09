@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 
 def loadSimpleData():
@@ -82,20 +83,30 @@ def adaclassify(data,classifierArr):
         aggPredict = np.zeros(data.shape[0])
     for i in classifierArr:
         predict = classify(data,i['dim'],i['ineq'],i['threshold'])
-        print(predict)
+        #print(predict)
         aggPredict += i['alpha']*predict
-    return aggPredict
+    return np.sign(aggPredict)
 
+#以下的代码是来验证马疝数据集上的作用
+def load_dataset(file):
+    dataset = pd.read_csv(file,delimiter='\t')
+    data = dataset.values[:,:-1]
+    label = dataset.values[:,-1]
+    return data,label
 
-
+Xtrain,Ytrain = load_dataset('horseColicTraining2.txt')
+Xtest,Ytest = load_dataset('horseColicTest2.txt')
+c=adaboost(Xtrain,Ytrain,50)
+predict = adaclassify(Xtest,c)
+print((predict!=Ytest).sum()/Ytest.size)
 
 
 ###测试程序
-data,label = loadSimpleData()
-c = adaboost(data,label,40)
-print(c)
-predict = adaclassify(2*np.ones(2),c)
-print(predict)
+def single_sample_test():
+    data,label = loadSimpleData()
+    c = adaboost(data,label,40)
+    predict = adaclassify(2*np.ones(2),c)
+    print(predict)
 def test_for_adaboost():
     data,label = loadSimpleData()
     c=adaboost(data,label,40)
